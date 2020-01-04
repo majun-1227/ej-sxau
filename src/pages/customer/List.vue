@@ -57,7 +57,7 @@ export default {
   // 用于存放网页中需要调用的方法
   methods:{
     loadData(){
-      let url = "http://localhost:6677/customer/findAll"
+      let url = "http://localhost:6677/customer/findAllserverTimezone=UTC"
       request.get(url).then((response)=>{
         // 将查询结果设置到customers中，this指向外部函数的this
         this.customers = response.data;
