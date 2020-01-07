@@ -7,11 +7,12 @@
     <!-- 表格 -->
     <el-table :data="products">
       <el-table-column prop="id" label="编号"></el-table-column>
-      <el-table-column prop="name" label="产品名称"></el-table-column>
+      <el-table-column prop="name" width="150px" label="产品名称"></el-table-column>
       <el-table-column prop="price" label="单价"></el-table-column>
-      <el-table-column prop="description" label="描述"></el-table-column>
+      <el-table-column prop="description" width="200px" label="描述"></el-table-column>
       <el-table-column prop="categoryId" label="所属分类"></el-table-column>
-      <el-table-column label="操作">
+      <el-table-column prop="photo" width="300px" label="添加图片"></el-table-column>
+      <el-table-column label="操作" fixed="right">
         <template v-slot="slot">
           <a href="" @click.prevent="toDeleteHandler(slot.row.id)">删除</a>
           <a href="" @click.prevent="toUpdateHandler(slot.row)">修改</a>
@@ -48,7 +49,19 @@
         <el-form-item label="描述">
           <el-input type="textarea" v-model="form.description"></el-input>
         </el-form-item>
-      </el-form>
+
+        <el-form-item label="图片">
+         <el-upload
+         class="upload-demo"
+         action="http://134.175.154.93:6677/file/upload"
+         :file-list="fileList"
+         :on-success="uploadSuccessHandler"
+         list-type="picture">
+         <el-button size="small" type="primary">点击上传</el-button>
+         <div slot="tip" class="el-upload_tip">只能上传JPG/PNG文件</div>
+         </el-upload>
+        </el-form-item>
+       </el-form>
 
       <span slot="footer" class="dialog-footer">
         <el-button size="small" @click="closeModalHandler">取 消</el-button>
@@ -66,6 +79,12 @@ import querystring from 'querystring'
 export default {
   // 用于存放网页中需要调用的方法
   methods:{
+    uploadSuccessHandler(response){
+      //加载图片,把从网上获取的图片地址弄下来
+      let photo="http://134.175.154.93:8888/group1/"+response.data.id
+      this.form.photo = photo;//设置图片地址，便于提交给后台
+    // console.log(response);
+    },
     loadCategory(){
       let url = "http://localhost:6677/category/findAll"
       request.get(url).then((response)=>{
@@ -131,6 +150,7 @@ export default {
     toUpdateHandler(row){
       // 模态框表单中显示出当前行的信息
       this.form = row;
+      this.fileList = []
       this.visible = true;
     },
     closeModalHandler(){
@@ -139,6 +159,7 @@ export default {
     toAddHandler(){
       // 将form变为初始值
       this.form = {}
+       this.fileList = []
       this.visible = true;
     }
   },
@@ -148,7 +169,8 @@ export default {
       visible:false,
       products:[],
       options:[],
-      form:{}
+      form:{},
+      fileList:[]
     }
   },
   created(){
